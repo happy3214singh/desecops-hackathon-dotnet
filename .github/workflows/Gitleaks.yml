@@ -1,25 +1,32 @@
 name: Gitleaks Scan
 
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+on: [push, pull_request]
 
 jobs:
   gitleaks:
-    name: Run Gitleaks
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
         uses: actions/checkout@v3
 
       - name: Run Gitleaks
+        id: gitleaks
         uses: gitleaks/gitleaks-action@v2
         with:
           args: detect --source=. --report-format sarif --report-path=gitleaks.sarif
 
+      - name: Check if SARIF report exists
+        run: |
+          if [ -f gitleaks.sarif ]; then
+            echo "SARIF report generated."
+          else
+            echo "No SARIF report generated. Possibly no secrets found."
+            echo "::set-output name=skip_upload::true"
+          fi
+        id: check_sarif
+
       - name: Upload SARIF report
-        uses: github/codeql-action/upload-sarif@v2
+        if: steps.check_sarif.outputs.skip_upload != 'true'
+        uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: gitleaks.sarif
