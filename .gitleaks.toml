@@ -1,0 +1,25 @@
+[allowlist]
+description = "Allowlist file"
+paths = [
+    '''\.git/''',
+    '''\.github/''',
+    '''\.gitleaks/''',
+]
+
+[[rules]]
+id = "azure-storage-key"
+description = "Azure Storage Account Key"
+regex = '''Eby8vdM02xNOcqFlqLfF82=='''
+tags = ["key", "Azure"]
+
+[[rules]]
+id = "generic-api-key"
+description = "Generic API Key"
+regex = '''(?i)(api[_-]?key|apikey|secret)['"]?\s*[:=]\s*['"]?([a-zA-Z0-9]{32,})['"]?'''
+tags = ["key", "API"]
+
+[[rules]]
+id = "connection-string"
+description = "Connection String"
+regex = '''(?i)(connection[_-]?string|connstring)['"]?\s*[:=]\s*['"]?([a-zA-Z0-9;=]+)['"]?'''
+tags = ["key", "Connection"] 
